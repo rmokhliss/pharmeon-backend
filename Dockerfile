@@ -3,13 +3,9 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY tsconfig*.json ./
+COPY src ./src/
 
-RUN npm install
+RUN npm install && npx prisma generate && npm run build
 
-RUN npx prisma generate
-
-COPY . .
-
-EXPOSE 3001
-
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]
