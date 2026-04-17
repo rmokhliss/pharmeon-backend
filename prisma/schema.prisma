@@ -8,99 +8,187 @@ datasource db {
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
-  reference   String          @unique
-  nom         String
-  marque      String
-  categorie   String
-  prix_achat  Float
-  prix_vente  Float
-  unite       String          @default("Pièce")
-  stock       Int             @default(0)
-  stock_min   Int             @default(5)
-  description String?
-  image_url   String?
-  actif       Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  mouvements  StockMovement[]
-  commandeItems CommandeItem[]
+  id                     Int                          @id @default(autoincrement())
+  reference              String                       @unique
+  nom                    String
+  marque                 String
+  categorie              String
+  prix_achat             Float
+  prix_vente             Float
+  cost_price             Float?
+  retail_price           Float?
+  wholesale_price        Float                        @default(0)
+  retail_discount_pct    Float                        @default(0)
+  wholesale_discount_pct Float                        @default(0)
+  unite                  String                       @default("Pièce")
+  stock                  Int                          @default(0)
+  stock_min              Int                          @default(5)
+  description            String?
+  image_url              String?
+  actif                  Boolean                      @default(true)
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+  mouvements             StockMovement[]
+  commandeItems          CommandeItem[]
+  bonCommandeItems       BonCommandeFournisseurItem[]
+  adjustementItems       StockAdjustementItem[]
 }
 
 model StockMovement {
-  id            Int          @id @default(autoincrement())
+  id            Int                     @id @default(autoincrement())
   type          String
   quantite      Int
   note          String?
+  source        String?
+  sourceId      Int?
   productId     Int
-  product       Product      @relation(fields: [productId], references: [id])
+  product       Product                 @relation(fields: [productId], references: [id])
   clientId      Int?
-  client        Client?      @relation(fields: [clientId], references: [id])
+  client        Client?                 @relation(fields: [clientId], references: [id])
   fournisseurId Int?
-  fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [id])
-  createdAt     DateTime     @default(now())
+  fournisseur   Fournisseur?            @relation(fields: [fournisseurId], references: [id])
+  bonCommandeId Int?
+  bonCommande   BonCommandeFournisseur? @relation(fields: [bonCommandeId], references: [id])
+  createdAt     DateTime                @default(now())
 }
 
 model Client {
-  id         Int             @id @default(autoincrement())
-  nom        String
-  type       String          @default("PARTICULIER")
-  telephone  String?
-  ville      String?
-  adresse    String?
-  email      String?         @unique
-  password   String?
-  actif      Boolean         @default(true)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  sorties    StockMovement[]
-  commandes  Commande[]
+  id        Int             @id @default(autoincrement())
+  nom       String
+  role      String          @default("CLIENT_PUBLIC")
+  type      String          @default("PARTICULIER")
+  telephone String?
+  ville     String?
+  adresse   String?
+  email     String?         @unique
+  password  String?
+  actif     Boolean         @default(true)
+  approved  Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  sorties   StockMovement[]
+  commandes Commande[]
 }
 
 model Commande {
-  id         Int            @id @default(autoincrement())
-  reference  String         @unique
-  statut     String         @default("EN_ATTENTE")
-  note       String?
-  clientId   Int
-  client     Client         @relation(fields: [clientId], references: [id])
-  items      CommandeItem[]
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id           Int            @id @default(autoincrement())
+  reference    String         @unique
+  statut       String         @default("EN_ATTENTE")
+  note         String?
+  clientId     Int
+  client       Client         @relation(fields: [clientId], references: [id])
+  items        CommandeItem[]
+  bonLivraison BonLivraison?
+  facture      Facture?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
 model CommandeItem {
-  id           Int      @id @default(autoincrement())
-  commandeId   Int
-  commande     Commande @relation(fields: [commandeId], references: [id])
-  productId    Int
-  product      Product  @relation(fields: [productId], references: [id])
-  quantite     Int
-  prixUnitaire Float
+  id             Int      @id @default(autoincrement())
+  commandeId     Int
+  commande       Commande @relation(fields: [commandeId], references: [id])
+  productId      Int
+  product        Product  @relation(fields: [productId], references: [id])
+  quantite       Int
+  prixUnitaire   Float
+  original_price Float?
+  final_price    Float?
 }
 
 model Fournisseur {
-  id         Int             @id @default(autoincrement())
-  nom        String
-  contact    String?
-  telephone  String?
-  ville      String?
-  actif      Boolean         @default(true)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  entrees    StockMovement[]
+  id           Int                      @id @default(autoincrement())
+  nom          String
+  contact      String?
+  telephone    String?
+  ville        String?
+  actif        Boolean                  @default(true)
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  entrees      StockMovement[]
+  bonCommandes BonCommandeFournisseur[]
 }
 
 model DemandeAcces {
+  id        Int      @id @default(autoincrement())
+  categorie String
+  nom       String
+  type      String?
+  ville     String?
+  telephone String?
+  email     String
+  contact   String?
+  message   String?
+  statut    String   @default("EN_ATTENTE")
+  createdAt DateTime @default(now())
+}
+
+model BonCommandeFournisseur {
+  id            Int                          @id @default(autoincrement())
+  reference     String                       @unique
+  statut        String                       @default("BROUILLON")
+  fournisseurId Int
+  fournisseur   Fournisseur                  @relation(fields: [fournisseurId], references: [id])
+  note          String?
+  expected_date DateTime?
+  items         BonCommandeFournisseurItem[]
+  mouvements    StockMovement[]
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @updatedAt
+}
+
+model BonCommandeFournisseurItem {
+  id        Int                    @id @default(autoincrement())
+  bonId     Int
+  bon       BonCommandeFournisseur @relation(fields: [bonId], references: [id])
+  productId Int
+  product   Product                @relation(fields: [productId], references: [id])
+  quantite  Int
+  prix_achat Float
+}
+
+model BonLivraison {
+  id              Int      @id @default(autoincrement())
+  reference       String   @unique
+  commandeId      Int      @unique
+  commande        Commande @relation(fields: [commandeId], references: [id])
+  delivery_date   DateTime?
+  tracking_number String?
+  statut          String   @default("EN_PREPARATION")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Facture {
   id         Int      @id @default(autoincrement())
-  categorie  String
-  nom        String
-  type       String?
-  ville      String?
-  telephone  String?
-  email      String
-  contact    String?
-  message    String?
-  statut     String   @default("EN_ATTENTE")
+  reference  String   @unique
+  commandeId Int      @unique
+  commande   Commande @relation(fields: [commandeId], references: [id])
+  statut     String   @default("BROUILLON")
+  total_ht   Float
+  total_ttc  Float
+  issued_at  DateTime?
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model StockAdjustement {
+  id        Int                    @id @default(autoincrement())
+  reference String                 @unique
+  type      String
+  statut    String                 @default("EN_ATTENTE")
+  note      String?
+  items     StockAdjustementItem[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+}
+
+model StockAdjustementItem {
+  id            Int              @id @default(autoincrement())
+  adjustementId Int
+  adjustement   StockAdjustement @relation(fields: [adjustementId], references: [id])
+  productId     Int
+  product       Product          @relation(fields: [productId], references: [id])
+  quantite      Int
+  cost_price    Float
 }
