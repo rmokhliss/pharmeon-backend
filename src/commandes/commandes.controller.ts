@@ -1,0 +1,59 @@
+import { Controller, Get, Post, Patch, Param, Body, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
+import { CommandesService } from './commandes.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { IsArray, IsInt, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class CommandeItemDto {
+  @IsInt() @IsPositive() productId: number;
+  @IsInt() @IsPositive() quantite: number;
+}
+
+class CreateCommandeDto {
+  @IsOptional() @IsString() note?: string;
+  @IsArray() @ValidateNested({ each: true }) @Type(() => CommandeItemDto) items: CommandeItemDto[];
+}
+
+class UpdateStatutDto {
+  @IsString() statut: string;
+}
+
+@Controller('commandes')
+export class CommandesController {
+  constructor(private service: CommandesService) {}
+
+  // Client routes (JWT required)
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Request() req: any, @Body() dto: CreateCommandeDto) {
+    return this.service.create(req.user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('mes-commandes')
+  mesCommandes(@Request() req: any) {
+    return this.service.findByClient(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('mes-commandes/:id')
+  maCommande(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
+    return this.service.findOne(id, req.user.id);
+  }
+
+  // Admin routes
+  @Get()
+  findAll() {
+    return this.service.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.service.findOne(id);
+  }
+
+  @Patch(':id/statut')
+  updateStatut(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateStatutDto) {
+    return this.service.updateStatut(id, dto.statut);
+  }
+}

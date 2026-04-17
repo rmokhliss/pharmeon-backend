@@ -23,6 +23,7 @@ model Product {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   mouvements  StockMovement[]
+  commandeItems CommandeItem[]
 }
 
 model StockMovement {
@@ -46,10 +47,35 @@ model Client {
   telephone  String?
   ville      String?
   adresse    String?
+  email      String?         @unique
+  password   String?
   actif      Boolean         @default(true)
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
   sorties    StockMovement[]
+  commandes  Commande[]
+}
+
+model Commande {
+  id         Int            @id @default(autoincrement())
+  reference  String         @unique
+  statut     String         @default("EN_ATTENTE")
+  note       String?
+  clientId   Int
+  client     Client         @relation(fields: [clientId], references: [id])
+  items      CommandeItem[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model CommandeItem {
+  id           Int      @id @default(autoincrement())
+  commandeId   Int
+  commande     Commande @relation(fields: [commandeId], references: [id])
+  productId    Int
+  product      Product  @relation(fields: [productId], references: [id])
+  quantite     Int
+  prixUnitaire Float
 }
 
 model Fournisseur {
