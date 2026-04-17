@@ -2,4 +2,4 @@
 cmds = ["npm install"]
 
 [start]
-cmd = "npm run start:prod"
+cmd = "node dist/main"
