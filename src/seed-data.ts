@@ -1,0 +1,81 @@
+export const seedProducts = [
+  // VISAGE
+  { reference: "VIS-001", nom: "KUORA Ampoule Flash Effet Lifting Immédiat 2 Ampoules", marque: "KUORA", categorie: "Visage", prix_achat: 62.25, prix_vente: 83.00, unite: "Pièce", description: "Ampoule flash effet lifting immédiat" },
+  { reference: "VIS-002", nom: "ISDIN Protector Labial SPF 50+", marque: "ISDIN", categorie: "Visage", prix_achat: 63.11, prix_vente: 84.15, unite: "Pièce", description: "Protecteur labial indice 50+" },
+  { reference: "VIS-003", nom: "CERAVE Crème Réparatrice Contour Yeux 14ml", marque: "CERAVE", categorie: "Visage", prix_achat: 76.77, prix_vente: 102.36, unite: "Pièce", description: "Crème réparatrice contour des yeux 14ml" },
+  { reference: "VIS-004", nom: "EUCERIN Sun Fluide Pigment Control SPF 50 50ml", marque: "EUCERIN", categorie: "Visage", prix_achat: 155.18, prix_vente: 206.91, unite: "Pièce", description: "Fluide solaire anti-taches SPF 50" },
+  { reference: "VIS-005", nom: "EUCERIN Hyaluron Filler 3 Effects Soin de Nuit 50ml", marque: "EUCERIN", categorie: "Visage", prix_achat: 240.57, prix_vente: 320.76, unite: "Pièce", description: "Soin de nuit anti-âge à l'acide hyaluronique" },
+  { reference: "VIS-006", nom: "LA ROCHE POSAY Cicaplast Baume Réparateur B5+ 100ml", marque: "LA ROCHE POSAY", categorie: "Visage", prix_achat: 137.86, prix_vente: 183.81, unite: "Pièce", description: "Baume réparateur multi-réparateur" },
+  { reference: "VIS-007", nom: "CERAVE Sérum Resurfaçant au Rétinol 30ml", marque: "CERAVE", categorie: "Visage", prix_achat: 131.47, prix_vente: 175.29, unite: "Pièce", description: "Sérum resurfaçant à la vitamine A" },
+  { reference: "VIS-008", nom: "SOMEBYMI Retinol Intense Crème Yeux Triple Action 30ml", marque: "SOMEBYMI", categorie: "Visage", prix_achat: 202.50, prix_vente: 270.00, unite: "Pièce", description: "Crème yeux triple action au rétinol" },
+  { reference: "VIS-009", nom: "ISDIN Protector Labial SPF 30", marque: "ISDIN", categorie: "Visage", prix_achat: 55.69, prix_vente: 74.25, unite: "Pièce", description: "Protecteur labial indice 30" },
+  { reference: "VIS-010", nom: "JAYJUN Pollution Proof Luminous Mask 27ml", marque: "JAYJUN", categorie: "Visage", prix_achat: 26.25, prix_vente: 35.00, unite: "Pièce", description: "Masque visage anti-pollution" },
+
+  // CHEVEUX
+  { reference: "CHV-001", nom: "L'Oreal Professionnel Absolut Repair Molecular Masque 100ml", marque: "L'OREAL PROFESSIONNEL", categorie: "Cheveux", prix_achat: 149.25, prix_vente: 199.00, unite: "Pièce", description: "Masque moléculaire sans rinçage réparateur" },
+  { reference: "CHV-002", nom: "ODARYM Gel de Lin Fixateur Naturel 100ml", marque: "ODARYM", categorie: "Cheveux", prix_achat: 45.00, prix_vente: 60.00, unite: "Pièce", description: "Gel fixateur naturel à base de lin" },
+  { reference: "CHV-003", nom: "Bjorn Axen Spray Mega Fixe Super Strong Hold 250ml", marque: "BJORN AXEN", categorie: "Cheveux", prix_achat: 157.41, prix_vente: 209.88, unite: "Pièce", description: "Spray fixation ultra forte 250ml" },
+  { reference: "CHV-004", nom: "Biokap Nutricolor 6.0 Blond Tabac", marque: "BIOKAP", categorie: "Cheveux", prix_achat: 118.80, prix_vente: 158.40, unite: "Pièce", description: "Coloration naturelle blond tabac" },
+  { reference: "CHV-005", nom: "L'Oreal Professionnel Absolut Repair Shampooing 500ml", marque: "L'OREAL PROFESSIONNEL", categorie: "Cheveux", prix_achat: 153.75, prix_vente: 205.00, unite: "Pièce", description: "Shampoing réparateur 500ml" },
+  { reference: "CHV-006", nom: "L'Oreal Professionnel Absolut Repair Shampooing 300ml", marque: "L'OREAL PROFESSIONNEL", categorie: "Cheveux", prix_achat: 110.25, prix_vente: 147.00, unite: "Pièce", description: "Shampoing réparateur 300ml" },
+  { reference: "CHV-007", nom: "Olaplex Bond Maintenance N°5 Après-Shampooing 250ml", marque: "OLAPLEX", categorie: "Cheveux", prix_achat: 224.44, prix_vente: 299.25, unite: "Pièce", description: "Après-shampoing réparateur liaisons N°5" },
+  { reference: "CHV-008", nom: "Nuxe Sun Huile Lactée Capillaire 100ml", marque: "NUXE", categorie: "Cheveux", prix_achat: 163.35, prix_vente: 217.80, unite: "Pièce", description: "Huile solaire capillaire protectrice" },
+  { reference: "CHV-009", nom: "Vichy Dercos Shampooing Anti Pelliculaire 200ml", marque: "VICHY", categorie: "Cheveux", prix_achat: 101.55, prix_vente: 135.40, unite: "Pièce", description: "Shampoing antipelliculaire dermato" },
+  { reference: "CHV-010", nom: "Klorane Lait d'Avoine Shampooing Sec 150ml", marque: "KLORANE", categorie: "Cheveux", prix_achat: 83.54, prix_vente: 111.39, unite: "Pièce", description: "Shampoing sec à l'avoine 150ml" },
+  { reference: "CHV-011", nom: "Vichy Dercos Energy+ Shampooing Stimulant Anti-Chute 400ml", marque: "VICHY", categorie: "Cheveux", prix_achat: 140.07, prix_vente: 186.76, unite: "Pièce", description: "Shampoing stimulant anti-chute 400ml" },
+  { reference: "CHV-012", nom: "POUXID Peigne Anti Poux Triple Action", marque: "POUXID", categorie: "Cheveux", prix_achat: 27.47, prix_vente: 36.63, unite: "Pièce", description: "Peigne anti-poux triple action" },
+
+  // CORPS
+  { reference: "CRP-001", nom: "CERAVE Huile Lavante Moussante Hydratante 236ml", marque: "CERAVE", categorie: "Corps", prix_achat: 80.14, prix_vente: 106.85, unite: "Pièce", description: "Huile lavante moussante hydratante" },
+  { reference: "CRP-002", nom: "VICHY Déodorant Anti Transpirant 48H Spray 125ml", marque: "VICHY", categorie: "Corps", prix_achat: 89.67, prix_vente: 119.56, unite: "Pièce", description: "Déodorant spray anti-transpirant 48h" },
+  { reference: "CRP-003", nom: "VICHY Crème Dépilatoire 150ml", marque: "VICHY", categorie: "Corps", prix_achat: 109.36, prix_vente: 145.81, unite: "Pièce", description: "Crème dépilatoire peaux sensibles" },
+  { reference: "CRP-004", nom: "ISDIN Ureadin Ultra 30 Exfoliating Crème 50ml", marque: "ISDIN", categorie: "Corps", prix_achat: 155.93, prix_vente: 207.90, unite: "Pièce", description: "Crème exfoliante 30% urée" },
+  { reference: "CRP-005", nom: "NUXE Sun Eau Délicieuse Parfumante 100ml", marque: "NUXE", categorie: "Corps", prix_achat: 289.58, prix_vente: 386.10, unite: "Pièce", description: "Eau parfumante après-soleil" },
+  { reference: "CRP-006", nom: "TILMAN Calmiderm Crème Irritations 40g", marque: "TILMAN", categorie: "Corps", prix_achat: 33.41, prix_vente: 44.55, unite: "Pièce", description: "Crème apaisante irritations cutanées" },
+  { reference: "CRP-007", nom: "TADAM Culottes Fuites Urinaires Coton Bio Plus Night x12", marque: "TADAM", categorie: "Corps", prix_achat: 116.25, prix_vente: 155.00, unite: "Pièce", description: "Culottes réutilisables fuites urinaires nuit" },
+  { reference: "CRP-008", nom: "SALUSTAR Lingettes Papier Toilette Humide 100 Unités", marque: "SALUSTAR", categorie: "Corps", prix_achat: 51.77, prix_vente: 69.03, unite: "Pièce", description: "Lingettes papier toilette humide 100u" },
+
+  // SOLAIRE
+  { reference: "SOL-001", nom: "NUXE Sun Lait Solaire Fondant SPF 30 + After Sun Shampoo", marque: "NUXE", categorie: "Solaire", prix_achat: 215.33, prix_vente: 287.10, unite: "Pièce", description: "Lait solaire SPF 30 + shampoing après-soleil" },
+  { reference: "SOL-002", nom: "EUCERIN Oil Sun Protect Control Dry Touch", marque: "EUCERIN", categorie: "Solaire", prix_achat: 147.76, prix_vente: 197.01, unite: "Pièce", description: "Fluide solaire contrôle sébum" },
+  { reference: "SOL-003", nom: "ISDIN Fotoprotector Pediatrics Transparent Spray SPF50 250ml", marque: "ISDIN", categorie: "Solaire", prix_achat: 193.05, prix_vente: 257.40, unite: "Pièce", description: "Spray solaire transparent enfant SPF50" },
+  { reference: "SOL-004", nom: "NUXE Sun Bronzing Oil Low Protection SPF10 150ml", marque: "NUXE", categorie: "Solaire", prix_achat: 207.90, prix_vente: 277.20, unite: "Pièce", description: "Huile bronzante faible protection SPF10" },
+  { reference: "SOL-005", nom: "LA ROCHE POSAY Anthelios UVMune 400 Dermo Pediatrics Spray 200ml", marque: "LA ROCHE POSAY", categorie: "Solaire", prix_achat: 227.36, prix_vente: 303.15, unite: "Pièce", description: "Spray solaire enfant SPF50+ 200ml" },
+  { reference: "SOL-006", nom: "NUXE Sun Bronzing Oil SPF 50 + After Sun Lotion", marque: "NUXE", categorie: "Solaire", prix_achat: 245.03, prix_vente: 326.70, unite: "Pièce", description: "Huile bronzante SPF50 + lotion après-soleil" },
+  { reference: "SOL-007", nom: "ISDIN Fotoprotector Spray Transparent Wet Skin 250ml", marque: "ISDIN", categorie: "Solaire", prix_achat: 193.05, prix_vente: 257.40, unite: "Pièce", description: "Spray solaire peau mouillée transparent" },
+  { reference: "SOL-008", nom: "ISDIN Post Solar After Sun Spray 200ml", marque: "ISDIN", categorie: "Solaire", prix_achat: 126.23, prix_vente: 168.30, unite: "Pièce", description: "Spray après-soleil 200ml" },
+  { reference: "SOL-009", nom: "CANTABRIA Heliocare 360 Gel Oil Free SPF 50+", marque: "CANTABRIA", categorie: "Solaire", prix_achat: 168.55, prix_vente: 224.73, unite: "Pièce", description: "Gel solaire sans huile SPF50+" },
+
+  // MAQUILLAGE
+  { reference: "MAQ-001", nom: "MUA Intense Couleur Crayon Yeux", marque: "MUA MAKEUP ACADEMY", categorie: "Maquillage", prix_achat: 26.25, prix_vente: 35.00, unite: "Pièce", description: "Crayon yeux couleur intense" },
+  { reference: "MAQ-002", nom: "MUA Blushed Blush Liquide", marque: "MUA MAKEUP ACADEMY", categorie: "Maquillage", prix_achat: 41.25, prix_vente: 55.00, unite: "Pièce", description: "Blush liquide naturel" },
+  { reference: "MAQ-003", nom: "Maybelline Brillant à Lèvres Superstay Vinyl Ink", marque: "MAYBELLINE", categorie: "Maquillage", prix_achat: 82.97, prix_vente: 110.63, unite: "Pièce", description: "Brillant lèvres longue tenue" },
+  { reference: "MAQ-004", nom: "Maybelline Fit Me Matte+ Poreless SPF 22", marque: "MAYBELLINE", categorie: "Maquillage", prix_achat: 72.00, prix_vente: 96.00, unite: "Pièce", description: "Fond de teint matifiant SPF22" },
+  { reference: "MAQ-005", nom: "Maybelline Fit Me Anti Cernes Correcteur Fluide", marque: "MAYBELLINE", categorie: "Maquillage", prix_achat: 65.03, prix_vente: 86.70, unite: "Pièce", description: "Correcteur fluide anti-cernes" },
+  { reference: "MAQ-006", nom: "ISDIN Fotoprotector Compact Arena SPF 50+", marque: "ISDIN", categorie: "Maquillage", prix_achat: 174.49, prix_vente: 232.65, unite: "Pièce", description: "Fond de teint compact solaire SPF50+" },
+  { reference: "MAQ-007", nom: "MUA Pro Base Full Coverage Matte Pressed Powder 6.5g", marque: "MUA MAKEUP ACADEMY", categorie: "Maquillage", prix_achat: 39.00, prix_vente: 52.00, unite: "Pièce", description: "Poudre compacte couverture totale" },
+  { reference: "MAQ-008", nom: "Poppy and Ivy Wispy Lash Soft and Fluffy", marque: "POPPY AND IVY", categorie: "Maquillage", prix_achat: 51.75, prix_vente: 69.00, unite: "Pièce", description: "Faux cils doux et volumineux" },
+  { reference: "MAQ-009", nom: "Maybelline Tattoo Liner Gel Pencil", marque: "MAYBELLINE", categorie: "Maquillage", prix_achat: 34.43, prix_vente: 45.90, unite: "Pièce", description: "Crayon liner gel longue tenue" },
+  { reference: "MAQ-010", nom: "MUA Bronzed Bronzeur Crème", marque: "MUA MAKEUP ACADEMY", categorie: "Maquillage", prix_achat: 59.25, prix_vente: 79.00, unite: "Pièce", description: "Bronzeur crème naturel" },
+
+  // BÉBÉ & MAMAN
+  { reference: "BBY-001", nom: "GILBERT Liniderm Liniment Oléo Calcaire 250ml", marque: "GILBERT", categorie: "Bébé & Maman", prix_achat: 47.52, prix_vente: 63.36, unite: "Pièce", description: "Liniment oléo-calcaire change bébé" },
+  { reference: "BBY-002", nom: "WATERWIPES Lingettes Bébé Pack 4x60", marque: "WATERWIPES", categorie: "Bébé & Maman", prix_achat: 162.86, prix_vente: 217.14, unite: "Pièce", description: "Lingettes bébé 99.9% eau pure pack 240u" },
+  { reference: "BBY-003", nom: "GILBERT Lingettes à l'Eau Biodégradables 70 pcs", marque: "GILBERT", categorie: "Bébé & Maman", prix_achat: 43.81, prix_vente: 58.41, unite: "Pièce", description: "Lingettes eau biodégradables 70 unités" },
+  { reference: "BBY-004", nom: "BAMBIDOU Cape de Bain Gaze de Coton Rose", marque: "BAMBIDOU", categorie: "Bébé & Maman", prix_achat: 112.50, prix_vente: 150.00, unite: "Pièce", description: "Cape de bain en gaze de coton" },
+  { reference: "BBY-005", nom: "MUSTELA Eau Rafraichissante et Coiffante 200ml", marque: "MUSTELA", categorie: "Bébé & Maman", prix_achat: 59.40, prix_vente: 79.20, unite: "Pièce", description: "Eau coiffante et rafraîchissante bébé" },
+  { reference: "BBY-006", nom: "GILBERT Liniderm Liniment Oléo Calcaire Stabilisé Pompe 1L", marque: "GILBERT", categorie: "Bébé & Maman", prix_achat: 135.14, prix_vente: 180.18, unite: "Pièce", description: "Liniment pompe grand format 1L" },
+  { reference: "BBY-007", nom: "BABYBIO Lait Croissance 3 Liquide 250ml", marque: "BABYBIO", categorie: "Bébé & Maman", prix_achat: 15.00, prix_vente: 20.00, unite: "Pièce", description: "Lait de croissance bio liquide" },
+
+  // BUCCO-DENTAIRE
+  { reference: "BDT-001", nom: "NEOPULSE Tête de Brosse à Dents", marque: "NEOPULSE", categorie: "Bucco-Dentaire", prix_achat: 175.23, prix_vente: 233.64, unite: "Pièce", description: "Tête de brosse à dents électrique" },
+  { reference: "BDT-002", nom: "ELGYDIUM Baby Brosse à Dents", marque: "ELGYDIUM", categorie: "Bucco-Dentaire", prix_achat: 34.52, prix_vente: 46.02, unite: "Pièce", description: "Brosse à dents bébé douce" },
+  { reference: "BDT-003", nom: "ELGYDIUM Dentifrice Enfant", marque: "ELGYDIUM", categorie: "Bucco-Dentaire", prix_achat: 33.02, prix_vente: 44.02, unite: "Pièce", description: "Dentifrice enfant goût fruité" },
+  { reference: "BDT-004", nom: "MIRADENT Whitening Gel", marque: "MIRADENT", categorie: "Bucco-Dentaire", prix_achat: 83.16, prix_vente: 110.88, unite: "Pièce", description: "Gel blanchissant dentaire" },
+  { reference: "BDT-005", nom: "GUM Gratte-Langue", marque: "GUM", categorie: "Bucco-Dentaire", prix_achat: 35.42, prix_vente: 47.22, unite: "Pièce", description: "Gratte-langue hygiène buccale" },
+  { reference: "BDT-006", nom: "VITIS Whitening Dentifrice Blancheur", marque: "VITIS", categorie: "Bucco-Dentaire", prix_achat: 49.01, prix_vente: 65.34, unite: "Pièce", description: "Dentifrice blancheur intense" },
+  { reference: "BDT-007", nom: "GUM Sensitive Gums Dentifrice", marque: "GUM", categorie: "Bucco-Dentaire", prix_achat: 48.11, prix_vente: 64.15, unite: "Pièce", description: "Dentifrice gencives sensibles" },
+  { reference: "BDT-008", nom: "GUM Activital Gel Dentifrice", marque: "GUM", categorie: "Bucco-Dentaire", prix_achat: 51.68, prix_vente: 68.90, unite: "Pièce", description: "Gel dentifrice protection complète" },
+  { reference: "BDT-009", nom: "ELGYDIUM Brosse à Dents Post-Opératoire", marque: "ELGYDIUM", categorie: "Bucco-Dentaire", prix_achat: 31.52, prix_vente: 42.02, unite: "Pièce", description: "Brosse à dents post-opératoire ultra-douce" },
+  { reference: "BDT-010", nom: "ELGYDIUM Multi-Action Dentifrice", marque: "ELGYDIUM", categorie: "Bucco-Dentaire", prix_achat: 39.52, prix_vente: 52.69, unite: "Pièce", description: "Dentifrice protection multi-action" },
+];
