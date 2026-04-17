@@ -5,13 +5,15 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding products...');
-  for (const product of seedProducts) {
-    await prisma.product.upsert({
-      where: { reference: product.reference },
-      update: {},
-      create: product,
-    });
-  }
+  await Promise.all(
+    seedProducts.map((product) =>
+      prisma.product.upsert({
+        where: { reference: product.reference },
+        update: {},
+        create: product,
+      }),
+    ),
+  );
   console.log(`${seedProducts.length} products seeded.`);
 }
 

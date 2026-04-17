@@ -1,11 +1,4 @@
-export class UpdateProductDto {
-  nom?: string;
-  marque?: string;
-  categorie?: string;
-  prix_achat?: number;
-  prix_vente?: number;
-  unite?: string;
-  stock?: number;
-  stock_min?: number;
-  description?: string;
-}
+import { PartialType, OmitType } from '@nestjs/mapped-types';
+import { CreateProductDto } from './create-product.dto';
+
+export class UpdateProductDto extends PartialType(OmitType(CreateProductDto, ['reference'] as const)) {}
