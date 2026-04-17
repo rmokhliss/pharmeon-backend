@@ -8,6 +8,11 @@ import { FournisseursModule } from './fournisseurs/fournisseurs.module';
 import { AuthModule } from './auth/auth.module';
 import { CommandesModule } from './commandes/commandes.module';
 import { DemandesModule } from './demandes/demandes.module';
+import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
+import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
+import { InvoicesModule } from './invoices/invoices.module';
+import { AdjustmentsModule } from './adjustments/adjustments.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -19,6 +24,11 @@ import { DemandesModule } from './demandes/demandes.module';
     AuthModule,
     CommandesModule,
     DemandesModule,
+    PurchaseOrdersModule,
+    DeliveryNotesModule,
+    InvoicesModule,
+    AdjustmentsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
 })
