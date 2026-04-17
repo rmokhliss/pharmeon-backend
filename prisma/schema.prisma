@@ -26,11 +26,40 @@ model Product {
 }
 
 model StockMovement {
-  id         Int      @id @default(autoincrement())
-  type       String   // ENTREE | SORTIE
-  quantite   Int
-  note       String?
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  createdAt  DateTime @default(now())
+  id            Int          @id @default(autoincrement())
+  type          String
+  quantite      Int
+  note          String?
+  productId     Int
+  product       Product      @relation(fields: [productId], references: [id])
+  clientId      Int?
+  client        Client?      @relation(fields: [clientId], references: [id])
+  fournisseurId Int?
+  fournisseur   Fournisseur? @relation(fields: [fournisseurId], references: [id])
+  createdAt     DateTime     @default(now())
+}
+
+model Client {
+  id         Int             @id @default(autoincrement())
+  nom        String
+  type       String          @default("PARTICULIER")
+  telephone  String?
+  ville      String?
+  adresse    String?
+  actif      Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  sorties    StockMovement[]
+}
+
+model Fournisseur {
+  id         Int             @id @default(autoincrement())
+  nom        String
+  contact    String?
+  telephone  String?
+  ville      String?
+  actif      Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  entrees    StockMovement[]
 }

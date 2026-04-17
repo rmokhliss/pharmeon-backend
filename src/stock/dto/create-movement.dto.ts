@@ -5,4 +5,6 @@ export class CreateMovementDto {
   @IsInt() @IsPositive() quantite: number;
   @IsInt() @IsPositive() productId: number;
   @IsOptional() @IsString() note?: string;
+  @IsOptional() @IsInt() clientId?: number;
+  @IsOptional() @IsInt() fournisseurId?: number;
 }

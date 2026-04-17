@@ -9,7 +9,11 @@ export class StockService {
   findAll(productId?: number) {
     return this.prisma.stockMovement.findMany({
       where: productId ? { productId } : undefined,
-      include: { product: { select: { nom: true, reference: true, unite: true } } },
+      include: {
+        product: { select: { nom: true, reference: true, unite: true } },
+        client: { select: { nom: true } },
+        fournisseur: { select: { nom: true } },
+      },
       orderBy: { createdAt: 'desc' },
       take: 200,
     });
