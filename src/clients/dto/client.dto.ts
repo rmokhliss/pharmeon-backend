@@ -19,4 +19,5 @@ export class RegisterClientDto {
   @IsOptional() @IsString() ville?: string;
   @IsOptional() @IsString() telephone?: string;
   @IsOptional() @IsString() message?: string;
+  @IsOptional() @IsString() password?: string;
 }

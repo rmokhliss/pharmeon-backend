@@ -10,7 +10,7 @@ type CreateCommandeDto = {
 export class CommandesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(clientId: number, dto: CreateCommandeDto) {
+  async create(clientId: number, dto: CreateCommandeDto, clientRole = 'CLIENT_PUBLIC') {
     if (!dto.items?.length) throw new BadRequestException('Panier vide');
 
     const products = await this.prisma.product.findMany({
@@ -28,18 +28,35 @@ export class CommandesService {
           create: dto.items.map((item) => {
             const p = products.find((p) => p.id === item.productId);
             if (!p) throw new BadRequestException(`Produit #${item.productId} introuvable`);
-            return { productId: item.productId, quantite: item.quantite, prixUnitaire: p.prix_vente };
+            const retailPrice = p.retail_price ?? p.prix_vente;
+            const wholesalePrice = p.wholesale_price || retailPrice;
+            const basePrice = clientRole === 'PRO' ? wholesalePrice : retailPrice;
+            const discountPct = clientRole === 'PRO' ? (p.wholesale_discount_pct || 0) : (p.retail_discount_pct || 0);
+            const finalP = Math.round(basePrice * (1 - discountPct / 100) * 100) / 100;
+            return {
+              productId: item.productId,
+              quantite: item.quantite,
+              prixUnitaire: finalP,
+              original_price: finalP,
+              final_price: finalP,
+            };
           }),
         },
       },
-      include: { items: { include: { product: { select: { nom: true, reference: true, unite: true } } } }, client: { select: { nom: true } } },
+      include: {
+        items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+        client: { select: { nom: true } },
+      },
     });
   }
 
   findByClient(clientId: number) {
     return this.prisma.commande.findMany({
       where: { clientId },
-      include: { items: { include: { product: { select: { nom: true, reference: true, unite: true } } } } },
+      include: {
+        items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+        bonLivraison: { select: { delivery_date: true, tracking_number: true, statut: true, reference: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -48,8 +65,10 @@ export class CommandesService {
     return this.prisma.commande.findFirstOrThrow({
       where: { id, ...(clientId ? { clientId } : {}) },
       include: {
-        items: { include: { product: { select: { nom: true, reference: true, unite: true, prix_vente: true } } } },
-        client: { select: { nom: true, ville: true, telephone: true } },
+        items: { include: { product: { select: { nom: true, reference: true, unite: true, retail_price: true, prix_vente: true } } } },
+        client: { select: { nom: true, ville: true, telephone: true, type: true, role: true } },
+        bonLivraison: true,
+        facture: true,
       },
     });
   }
@@ -61,30 +80,97 @@ export class CommandesService {
   findAll() {
     return this.prisma.commande.findMany({
       include: {
-        client: { select: { nom: true, ville: true, type: true } },
-        items: { include: { product: { select: { nom: true } } } },
+        client: { select: { nom: true, ville: true, type: true, role: true } },
+        items: {
+          include: { product: { select: { nom: true } } },
+        },
+        bonLivraison: { select: { reference: true, tracking_number: true, delivery_date: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async updateStatut(id: number, statut: string) {
+  async updateItemPrice(commandeId: number, itemId: number, finalPrice: number) {
+    const commande = await this.prisma.commande.findUnique({ where: { id: commandeId } });
+    if (!commande) throw new NotFoundException(`Commande #${commandeId} introuvable`);
+    if (commande.statut === 'LIVREE' || commande.statut === 'ANNULEE') {
+      throw new BadRequestException('Impossible de modifier une commande livrée ou annulée');
+    }
+    return this.prisma.commandeItem.update({
+      where: { id: itemId },
+      data: { final_price: finalPrice, prixUnitaire: finalPrice },
+    });
+  }
+
+  async updateStatut(id: number, statut: string, extra?: { tracking_number?: string; delivery_date?: string }) {
     const validStatuts = ['EN_ATTENTE', 'VALIDEE', 'EN_COURS', 'LIVREE', 'ANNULEE'];
     if (!validStatuts.includes(statut)) throw new BadRequestException('Statut invalide');
 
-    const commande = await this.prisma.commande.findUnique({ where: { id }, include: { items: true } });
+    const commande = await this.prisma.commande.findUnique({
+      where: { id },
+      include: { items: { include: { product: true } }, bonLivraison: true },
+    });
     if (!commande) throw new NotFoundException(`Commande #${id} introuvable`);
 
-    if (statut === 'VALIDEE' && commande.statut === 'EN_ATTENTE') {
-      // Generate stock exits for each item
-      const ops = commande.items.flatMap((item) => [
-        this.prisma.stockMovement.create({
-          data: { type: 'SORTIE', quantite: item.quantite, productId: item.productId, clientId: commande.clientId, note: `Commande ${commande.reference}` },
-        }),
-        this.prisma.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantite } } }),
-      ]);
+    if (statut === 'LIVREE' && commande.statut !== 'LIVREE') {
+      // Check stock availability
+      for (const item of commande.items) {
+        if (item.product.stock < item.quantite) {
+          throw new BadRequestException(`Stock insuffisant pour ${item.product.nom} (disponible: ${item.product.stock})`);
+        }
+      }
+
+      const blReference = `BL-${Date.now()}`;
+      const facReference = `FAC-${Date.now()}`;
+      const totalHT = commande.items.reduce((s, i) => {
+        const price = i.final_price ?? i.prixUnitaire;
+        return s + price * i.quantite;
+      }, 0);
+
+      // Only create stock movements if not already done (legacy orders)
+      const existingMvt = await this.prisma.stockMovement.findFirst({
+        where: { note: { contains: commande.reference } },
+      });
+
+      const stockOps = existingMvt ? [] : commande.items.flatMap((item) => {
+        const price = item.final_price ?? item.prixUnitaire;
+        return [
+          this.prisma.stockMovement.create({
+            data: {
+              type: 'SORTIE', quantite: item.quantite, productId: item.productId,
+              clientId: commande.clientId,
+              note: `Commande ${commande.reference}`,
+              source: 'COMMANDE', sourceId: commande.id,
+            },
+          }),
+          this.prisma.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantite } },
+          }),
+        ];
+      });
+
       await this.prisma.$transaction([
-        ...ops,
+        ...stockOps,
+        ...(commande.bonLivraison ? [] : [this.prisma.bonLivraison.create({
+          data: {
+            reference: blReference,
+            commandeId: id,
+            tracking_number: extra?.tracking_number ?? null,
+            delivery_date: extra?.delivery_date ? new Date(extra.delivery_date) : new Date(),
+            statut: 'LIVRE',
+          },
+        })]),
+        this.prisma.facture.upsert({
+          where: { commandeId: id },
+          create: {
+            reference: facReference, commandeId: id,
+            total_ht: Math.round(totalHT * 100) / 100,
+            total_ttc: Math.round(totalHT * 1.2 * 100) / 100,
+            statut: 'EMISE', issued_at: new Date(),
+          },
+          update: {},
+        }),
         this.prisma.commande.update({ where: { id }, data: { statut } }),
       ]);
     } else {
