@@ -19,6 +19,7 @@ model Product {
   stock       Int             @default(0)
   stock_min   Int             @default(5)
   description String?
+  image_url   String?
   actif       Boolean         @default(true)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -88,4 +89,18 @@ model Fournisseur {
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
   entrees    StockMovement[]
+}
+
+model DemandeAcces {
+  id         Int      @id @default(autoincrement())
+  categorie  String
+  nom        String
+  type       String?
+  ville      String?
+  telephone  String?
+  email      String
+  contact    String?
+  message    String?
+  statut     String   @default("EN_ATTENTE")
+  createdAt  DateTime @default(now())
 }

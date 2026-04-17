@@ -7,6 +7,7 @@ import { ClientsModule } from './clients/clients.module';
 import { FournisseursModule } from './fournisseurs/fournisseurs.module';
 import { AuthModule } from './auth/auth.module';
 import { CommandesModule } from './commandes/commandes.module';
+import { DemandesModule } from './demandes/demandes.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CommandesModule } from './commandes/commandes.module';
     FournisseursModule,
     AuthModule,
     CommandesModule,
+    DemandesModule,
   ],
   controllers: [AppController],
 })
