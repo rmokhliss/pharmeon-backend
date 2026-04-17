@@ -1,10 +1,25 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
 import { ClientsService } from './clients.service';
-import { CreateClientDto, UpdateClientDto } from './dto/client.dto';
+import { CreateClientDto, UpdateClientDto, RegisterClientDto } from './dto/client.dto';
 
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
+
+  @Get('pending-count')
+  pendingCount() {
+    return this.clientsService.pendingCount();
+  }
+
+  @Get('pending')
+  findPending() {
+    return this.clientsService.findPending();
+  }
+
+  @Post('register')
+  register(@Body() dto: RegisterClientDto) {
+    return this.clientsService.register(dto);
+  }
 
   @Get()
   findAll(@Query('search') search?: string) {

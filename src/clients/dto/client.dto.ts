@@ -11,3 +11,12 @@ export class CreateClientDto {
 }
 
 export class UpdateClientDto extends PartialType(CreateClientDto) {}
+
+export class RegisterClientDto {
+  @IsString() @IsNotEmpty() nom: string;
+  @IsIn(['PHARMACIE', 'PARA', 'PARTICULIER']) type: string;
+  @IsEmail() email: string;
+  @IsOptional() @IsString() ville?: string;
+  @IsOptional() @IsString() telephone?: string;
+  @IsOptional() @IsString() message?: string;
+}

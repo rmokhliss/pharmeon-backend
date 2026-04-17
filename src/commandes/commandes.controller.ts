@@ -42,6 +42,11 @@ export class CommandesController {
   }
 
   // Admin routes
+  @Get('pending-count')
+  pendingCount() {
+    return this.service.pendingCount();
+  }
+
   @Get()
   findAll() {
     return this.service.findAll();

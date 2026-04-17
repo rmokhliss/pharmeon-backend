@@ -54,6 +54,10 @@ export class CommandesService {
     });
   }
 
+  pendingCount() {
+    return this.prisma.commande.count({ where: { statut: 'EN_ATTENTE' } });
+  }
+
   findAll() {
     return this.prisma.commande.findMany({
       include: {

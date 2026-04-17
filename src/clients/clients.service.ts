@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateClientDto, UpdateClientDto } from './dto/client.dto';
+import { CreateClientDto, UpdateClientDto, RegisterClientDto } from './dto/client.dto';
 
 @Injectable()
 export class ClientsService {
@@ -24,6 +24,21 @@ export class ClientsService {
 
   create(dto: CreateClientDto) {
     return this.prisma.client.create({ data: dto });
+  }
+
+  findPending() {
+    return this.prisma.client.findMany({ where: { actif: false }, orderBy: { id: 'desc' } });
+  }
+
+  register(dto: RegisterClientDto) {
+    return this.prisma.client.create({
+      data: { nom: dto.nom, type: dto.type, email: dto.email, ville: dto.ville, telephone: dto.telephone, actif: false },
+      select: { id: true, nom: true, email: true, type: true },
+    });
+  }
+
+  pendingCount() {
+    return this.prisma.client.count({ where: { actif: false } });
   }
 
   async update(id: number, dto: UpdateClientDto) {
