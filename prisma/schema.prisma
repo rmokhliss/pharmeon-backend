@@ -8,18 +8,29 @@ datasource db {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  reference   String   @unique
+  id          Int             @id @default(autoincrement())
+  reference   String          @unique
   nom         String
   marque      String
   categorie   String
   prix_achat  Float
   prix_vente  Float
-  unite       String   @default("Pièce")
-  stock       Int      @default(0)
-  stock_min   Int      @default(5)
+  unite       String          @default("Pièce")
+  stock       Int             @default(0)
+  stock_min   Int             @default(5)
   description String?
-  actif       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  actif       Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  mouvements  StockMovement[]
+}
+
+model StockMovement {
+  id         Int      @id @default(autoincrement())
+  type       String   // ENTREE | SORTIE
+  quantite   Int
+  note       String?
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  createdAt  DateTime @default(now())
 }
