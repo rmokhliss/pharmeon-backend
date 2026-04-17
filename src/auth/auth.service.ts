@@ -19,6 +19,14 @@ export class AuthService {
     return { token, client: { id: client.id, nom: client.nom, email: client.email, type: client.type, ville: client.ville } };
   }
 
+  async adminLogin(username: string, password: string) {
+    const adminUser = process.env.ADMIN_USERNAME || 'admin';
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin';
+    if (username !== adminUser || password !== adminPass) throw new UnauthorizedException('Identifiants invalides');
+    const token = this.jwt.sign({ sub: 'admin', role: 'admin' });
+    return { token };
+  }
+
   async setPassword(clientId: number, password: string) {
     const hashed = await bcrypt.hash(password, 10);
     return this.prisma.client.update({ where: { id: clientId }, data: { password: hashed } });

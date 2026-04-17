@@ -1,10 +1,15 @@
-import { Controller, Post, Body, Patch, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, ParseIntPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 class LoginDto {
-  @IsEmail() email: string;
-  @IsString() @MinLength(4) password: string;
+  @IsString() email: string;
+  @IsString() @MinLength(1) password: string;
+}
+
+class AdminLoginDto {
+  @IsString() username: string;
+  @IsString() password: string;
 }
 
 class SetPasswordDto {
@@ -18,6 +23,11 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto.email, dto.password);
+  }
+
+  @Post('admin/login')
+  adminLogin(@Body() dto: AdminLoginDto) {
+    return this.auth.adminLogin(dto.username, dto.password);
   }
 
   @Patch('client/:id/password')
