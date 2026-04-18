@@ -20,6 +20,7 @@ class UpdateStatutDto {
   @IsString() statut: string;
   @IsOptional() @IsString() tracking_number?: string;
   @IsOptional() @IsString() delivery_date?: string;
+  @IsOptional() @IsInt() @IsPositive() livreurId?: number;
 }
 
 class UpdateItemPriceDto {

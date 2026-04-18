@@ -13,6 +13,7 @@ import { DeliveryNotesModule } from './delivery-notes/delivery-notes.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { AdjustmentsModule } from './adjustments/adjustments.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { LivreursModule } from './livreurs/livreurs.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     InvoicesModule,
     AdjustmentsModule,
     AnalyticsModule,
+    LivreursModule,
   ],
   controllers: [AppController],
 })

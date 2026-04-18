@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { DeliveryNotesService } from './delivery-notes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -18,6 +18,26 @@ export class DeliveryNotesController {
   @Roles('ADMIN')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) { return this.deliveryNotesService.findOne(id); }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { delivery_date?: string; tracking_number?: string; statut?: string; livreurId?: number | null },
+  ) {
+    return this.deliveryNotesService.update(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id/livreur')
+  assignLivreur(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { livreurId: number | null },
+  ) {
+    return this.deliveryNotesService.assignLivreur(id, body.livreurId);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

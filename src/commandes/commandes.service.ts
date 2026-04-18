@@ -102,7 +102,7 @@ export class CommandesService {
     });
   }
 
-  async updateStatut(id: number, statut: string, extra?: { tracking_number?: string; delivery_date?: string }) {
+  async updateStatut(id: number, statut: string, extra?: { tracking_number?: string; delivery_date?: string; livreurId?: number | null }) {
     const validStatuts = ['EN_ATTENTE', 'VALIDEE', 'EN_COURS', 'LIVREE', 'ANNULEE'];
     if (!validStatuts.includes(statut)) throw new BadRequestException('Statut invalide');
 
@@ -158,6 +158,7 @@ export class CommandesService {
             commandeId: id,
             tracking_number: extra?.tracking_number ?? null,
             delivery_date: extra?.delivery_date ? new Date(extra.delivery_date) : new Date(),
+            livreurId: extra?.livreurId ?? null,
             statut: 'LIVRE',
           },
         })]),

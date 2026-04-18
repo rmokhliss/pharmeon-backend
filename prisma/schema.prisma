@@ -167,15 +167,31 @@ model BonCommandeFournisseurItem {
 }
 
 model BonLivraison {
-  id              Int      @id @default(autoincrement())
-  reference       String   @unique
-  commandeId      Int      @unique
-  commande        Commande @relation(fields: [commandeId], references: [id])
+  id              Int       @id @default(autoincrement())
+  reference       String    @unique
+  commandeId      Int       @unique
+  commande        Commande  @relation(fields: [commandeId], references: [id])
+  livreurId       Int?
+  livreur         Livreur?  @relation(fields: [livreurId], references: [id])
   delivery_date   DateTime?
   tracking_number String?
-  statut          String   @default("EN_PREPARATION")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  statut          String    @default("EN_PREPARATION")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Livreur {
+  id         Int            @id @default(autoincrement())
+  nom        String
+  telephone  String?
+  ville      String?
+  vehicule   String?
+  cin        String?
+  note       String?
+  actif      Boolean        @default(true)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  livraisons BonLivraison[]
 }
 
 model Facture {
