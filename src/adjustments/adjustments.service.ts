@@ -26,7 +26,7 @@ export class AdjustmentsService {
   }
 
   create(dto: CreateAdjDto) {
-    const validTypes = ['EXPIRATION', 'DOMMAGE', 'PERTE', 'RETOUR'];
+    const validTypes = ['EXPIRATION', 'CASSE', 'DOMMAGE', 'PERTE', 'RETOUR'];
     if (!validTypes.includes(dto.type)) throw new BadRequestException('Type invalide');
     const reference = `ADJ-${Date.now()}`;
     return this.prisma.stockAdjustement.create({
