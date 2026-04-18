@@ -14,6 +14,9 @@ export class AuthService {
       if (client.role === 'PRO') throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur');
       throw new UnauthorizedException('Compte désactivé');
     }
+    if (client.role === 'PRO' && !client.approved) {
+      throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur');
+    }
 
     const valid = await bcrypt.compare(password, client.password);
     if (!valid) throw new UnauthorizedException('Identifiants invalides');
