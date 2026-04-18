@@ -6,9 +6,15 @@ export class CreateDemandeDto {
   nom: string;
   type?: string;
   ville?: string;
+  code_postal?: string;
+  adresse?: string;
   telephone?: string;
   email: string;
   contact?: string;
+  ice?: string;
+  patente?: string;
+  rc?: string;
+  site_web?: string;
   message?: string;
 }
 
@@ -41,7 +47,14 @@ export class DemandesService {
           nom: demande.nom,
           contact: demande.contact || undefined,
           telephone: demande.telephone || undefined,
+          email: demande.email || undefined,
           ville: demande.ville || undefined,
+          code_postal: demande.code_postal || undefined,
+          adresse: demande.adresse || undefined,
+          ice: demande.ice || undefined,
+          patente: demande.patente || undefined,
+          rc: demande.rc || undefined,
+          site_web: demande.site_web || undefined,
           actif: true,
         },
       });
@@ -53,7 +66,14 @@ export class DemandesService {
           type: demande.type || (role === 'PRO' ? 'PHARMACIE' : 'PARTICULIER'),
           email: demande.email,
           ville: demande.ville || undefined,
+          code_postal: demande.code_postal || undefined,
+          adresse: demande.adresse || undefined,
           telephone: demande.telephone || undefined,
+          contact_nom: demande.contact || undefined,
+          ice: demande.ice || undefined,
+          patente: demande.patente || undefined,
+          rc: demande.rc || undefined,
+          site_web: demande.site_web || undefined,
           role,
           approved: true,
           actif: true,

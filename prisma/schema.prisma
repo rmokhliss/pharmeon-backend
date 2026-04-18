@@ -53,21 +53,27 @@ model StockMovement {
 }
 
 model Client {
-  id        Int             @id @default(autoincrement())
-  nom       String
-  role      String          @default("CLIENT_PUBLIC")
-  type      String          @default("PARTICULIER")
-  telephone String?
-  ville     String?
-  adresse   String?
-  email     String?         @unique
-  password  String?
-  actif     Boolean         @default(true)
-  approved  Boolean         @default(false)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  sorties   StockMovement[]
-  commandes Commande[]
+  id           Int             @id @default(autoincrement())
+  nom          String
+  role         String          @default("CLIENT_PUBLIC")
+  type         String          @default("PARTICULIER")
+  telephone    String?
+  ville        String?
+  code_postal  String?
+  adresse      String?
+  email        String?         @unique
+  password     String?
+  contact_nom  String?
+  ice          String?
+  patente      String?
+  rc           String?
+  site_web     String?
+  actif        Boolean         @default(true)
+  approved     Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  sorties      StockMovement[]
+  commandes    Commande[]
 }
 
 model Commande {
@@ -101,7 +107,14 @@ model Fournisseur {
   nom          String
   contact      String?
   telephone    String?
+  email        String?
   ville        String?
+  code_postal  String?
+  adresse      String?
+  ice          String?
+  patente      String?
+  rc           String?
+  site_web     String?
   actif        Boolean                  @default(true)
   createdAt    DateTime                 @default(now())
   updatedAt    DateTime                 @updatedAt
@@ -110,17 +123,23 @@ model Fournisseur {
 }
 
 model DemandeAcces {
-  id        Int      @id @default(autoincrement())
-  categorie String
-  nom       String
-  type      String?
-  ville     String?
-  telephone String?
-  email     String
-  contact   String?
-  message   String?
-  statut    String   @default("EN_ATTENTE")
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  categorie   String
+  nom         String
+  type        String?
+  ville       String?
+  code_postal String?
+  adresse     String?
+  telephone   String?
+  email       String
+  contact     String?
+  ice         String?
+  patente     String?
+  rc          String?
+  site_web    String?
+  message     String?
+  statut      String   @default("EN_ATTENTE")
+  createdAt   DateTime @default(now())
 }
 
 model BonCommandeFournisseur {
