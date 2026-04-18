@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, UseGuards, Request, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { CommandesService } from './commandes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -68,6 +69,23 @@ export class CommandesController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) { return this.service.findOne(id); }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get(':id/pdf')
+  async getPdf(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+    const html = await this.service.generatePdf(id);
+    res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `inline; filename="bc-${id}.html"` });
+    res.send(html);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('mes-commandes/:id/pdf')
+  async getMyPdf(@Param('id', ParseIntPipe) id: number, @Request() req: any, @Res() res: Response) {
+    const html = await this.service.generatePdf(id, req.user.id);
+    res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `inline; filename="bc-${id}.html"` });
+    res.send(html);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { PdfService } from '../pdf/pdf.service';
 
 type CreateCommandeDto = {
   note?: string;
@@ -8,7 +9,43 @@ type CreateCommandeDto = {
 
 @Injectable()
 export class CommandesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private pdf: PdfService) {}
+
+  async generatePdf(id: number, clientId?: number): Promise<string> {
+    const c = await this.prisma.commande.findFirstOrThrow({
+      where: { id, ...(clientId ? { clientId } : {}) },
+      include: {
+        items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+        client: true,
+      },
+    });
+    return this.pdf.generateCommandeClientHtml({
+      reference: c.reference,
+      statut: c.statut,
+      note: c.note,
+      createdAt: c.createdAt,
+      client: {
+        nom: c.client.nom,
+        type: c.client.type,
+        role: c.client.role,
+        telephone: c.client.telephone,
+        email: c.client.email,
+        adresse: c.client.adresse,
+        ville: c.client.ville,
+        code_postal: c.client.code_postal,
+        ice: c.client.ice,
+        patente: c.client.patente,
+        rc: c.client.rc,
+        site_web: c.client.site_web,
+      },
+      items: c.items.map((i) => ({
+        quantite: i.quantite,
+        prixUnitaire: i.prixUnitaire,
+        final_price: i.final_price,
+        product: i.product,
+      })),
+    });
+  }
 
   async create(clientId: number, dto: CreateCommandeDto, clientRole = 'CLIENT_PUBLIC') {
     if (!dto.items?.length) throw new BadRequestException('Panier vide');

@@ -23,6 +23,28 @@ type PurchaseOrderData = {
   items: { quantite: number; prix_achat: number; product: { nom: string; reference: string; unite: string } }[];
 };
 
+type CommandeClientData = {
+  reference: string;
+  statut: string;
+  note: string | null;
+  createdAt: Date;
+  client: {
+    nom: string;
+    type: string;
+    role?: string | null;
+    telephone: string | null;
+    email: string | null;
+    adresse: string | null;
+    ville: string | null;
+    code_postal: string | null;
+    ice: string | null;
+    patente: string | null;
+    rc: string | null;
+    site_web: string | null;
+  };
+  items: { quantite: number; prixUnitaire: number; final_price: number | null; product: { nom: string; reference: string; unite: string } }[];
+};
+
 type DeliveryNoteData = {
   reference: string;
   delivery_date: Date | null;
@@ -192,6 +214,81 @@ export class PdfService {
         <div><p style="color:#6b7280;font-size:12px">Signature fournisseur</p><div style="border-top:1px solid #9ca3af;width:200px;margin-top:40px"></div></div>
       </div>
       <div class="footer">Pharmeon — Bon de commande généré automatiquement — ${new Date().toLocaleDateString('fr-FR')}</div>
+    </body></html>`;
+  }
+
+  generateCommandeClientHtml(data: CommandeClientData): string {
+    const dateCreated = new Date(data.createdAt).toLocaleDateString('fr-FR');
+    const badgeClass =
+      data.statut === 'LIVREE' ? 'badge-green' :
+      data.statut === 'VALIDEE' || data.statut === 'EN_COURS' ? 'badge-blue' : 'badge-gray';
+    const c = data.client;
+    let totalHT = 0;
+    const rows = data.items.map((item) => {
+      const pu = item.final_price ?? item.prixUnitaire;
+      const lineTotal = Math.round(pu * item.quantite * 100) / 100;
+      totalHT += lineTotal;
+      return `
+        <tr>
+          <td>${this.escHtml(item.product.reference)}</td>
+          <td>${this.escHtml(item.product.nom)}</td>
+          <td style="text-align:center">${item.quantite} ${this.escHtml(item.product.unite)}</td>
+          <td style="text-align:right">${pu.toFixed(2)} MAD</td>
+          <td style="text-align:right">${lineTotal.toFixed(2)} MAD</td>
+        </tr>`;
+    }).join('');
+    totalHT = Math.round(totalHT * 100) / 100;
+    const totalTTC = Math.round(totalHT * 1.2 * 100) / 100;
+
+    const isPro = c.role === 'PRO' || !!(c.ice || c.patente || c.rc);
+    const proIds = [
+      c.ice ? `ICE : ${this.escHtml(c.ice)}` : null,
+      c.patente ? `Patente : ${this.escHtml(c.patente)}` : null,
+      c.rc ? `RC : ${this.escHtml(c.rc)}` : null,
+    ].filter(Boolean).join(' · ');
+
+    return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+      <style>${this.baseStyle()}</style></head><body>
+      <div class="header">
+        <div>
+          <div class="logo" style="color:#374151">${this.escHtml(c.nom)}</div>
+          ${c.adresse ? `<p style="color:#6b7280;font-size:12px;margin:4px 0 0">${this.escHtml(c.adresse)}</p>` : ''}
+          ${(c.ville || c.code_postal) ? `<p style="color:#6b7280;font-size:12px;margin:2px 0 0">${this.escHtml([c.code_postal, c.ville].filter(Boolean).join(' '))}</p>` : ''}
+          ${c.telephone ? `<p style="color:#6b7280;font-size:12px;margin:2px 0 0">Tél : ${this.escHtml(c.telephone)}</p>` : ''}
+          ${c.email ? `<p style="color:#6b7280;font-size:12px;margin:2px 0 0">${this.escHtml(c.email)}</p>` : ''}
+          ${isPro && proIds ? `<p style="color:#6b7280;font-size:11px;margin:6px 0 0">${proIds}</p>` : ''}
+        </div>
+        <div style="text-align:right">
+          <p class="doc-title">BON DE COMMANDE</p>
+          <p class="doc-ref">${this.escHtml(data.reference)}</p>
+          <p class="doc-ref">Émis le ${dateCreated}</p>
+          <span class="badge ${badgeClass}">${data.statut}</span>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-block">
+          <h4>Adressé à</h4>
+          <p><strong>Pharmeon</strong></p>
+          <p style="color:#6b7280;font-size:12px">Grossiste pharmaceutique</p>
+        </div>
+        ${data.note ? `<div class="meta-block"><h4>Note</h4><p>${this.escHtml(data.note)}</p></div>` : '<div class="meta-block"></div>'}
+      </div>
+      <table>
+        <thead><tr><th>Réf.</th><th>Désignation</th><th>Qté</th><th>PU HT</th><th>Total HT</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="totals">
+        <table>
+          <tr><td>Total HT</td><td>${totalHT.toFixed(2)} MAD</td></tr>
+          <tr><td>TVA (20%)</td><td>${(totalTTC - totalHT).toFixed(2)} MAD</td></tr>
+          <tr class="total-ttc"><td><strong>Total TTC</strong></td><td><strong>${totalTTC.toFixed(2)} MAD</strong></td></tr>
+        </table>
+      </div>
+      <div style="margin-top:40px;display:flex;justify-content:space-between">
+        <div><p style="color:#6b7280;font-size:12px">Signature client</p><div style="border-top:1px solid #9ca3af;width:200px;margin-top:40px"></div></div>
+        <div><p style="color:#6b7280;font-size:12px">Cachet Pharmeon</p><div style="border-top:1px solid #9ca3af;width:200px;margin-top:40px"></div></div>
+      </div>
+      <div class="footer">Document émis par ${this.escHtml(c.nom)} — ${new Date().toLocaleDateString('fr-FR')}</div>
     </body></html>`;
   }
 
