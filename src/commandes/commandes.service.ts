@@ -90,16 +90,63 @@ export class CommandesService {
     });
   }
 
-  async updateItemPrice(commandeId: number, itemId: number, finalPrice: number) {
-    const commande = await this.prisma.commande.findUnique({ where: { id: commandeId } });
+  private async assertEditable(commandeId: number) {
+    const commande = await this.prisma.commande.findUnique({
+      where: { id: commandeId },
+      include: { client: { select: { role: true } } },
+    });
     if (!commande) throw new NotFoundException(`Commande #${commandeId} introuvable`);
     if (commande.statut === 'LIVREE' || commande.statut === 'ANNULEE') {
       throw new BadRequestException('Impossible de modifier une commande livrée ou annulée');
     }
+    return commande;
+  }
+
+  async updateItemPrice(commandeId: number, itemId: number, finalPrice: number) {
+    await this.assertEditable(commandeId);
     return this.prisma.commandeItem.update({
       where: { id: itemId },
       data: { final_price: finalPrice, prixUnitaire: finalPrice },
     });
+  }
+
+  async updateItemQuantity(commandeId: number, itemId: number, quantite: number) {
+    await this.assertEditable(commandeId);
+    if (quantite < 1) throw new BadRequestException('Quantité doit être ≥ 1');
+    return this.prisma.commandeItem.update({
+      where: { id: itemId },
+      data: { quantite },
+    });
+  }
+
+  async addItem(commandeId: number, productId: number, quantite: number) {
+    const commande = await this.assertEditable(commandeId);
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    if (!product || !product.actif) throw new BadRequestException(`Produit #${productId} introuvable`);
+    if (quantite < 1) throw new BadRequestException('Quantité doit être ≥ 1');
+
+    const clientRole = commande.client?.role || 'CLIENT_PUBLIC';
+    const retailPrice = product.retail_price ?? product.prix_vente;
+    const wholesalePrice = product.wholesale_price || retailPrice;
+    const basePrice = clientRole === 'PRO' ? wholesalePrice : retailPrice;
+    const discountPct = clientRole === 'PRO' ? (product.wholesale_discount_pct || 0) : (product.retail_discount_pct || 0);
+    const finalP = Math.round(basePrice * (1 - discountPct / 100) * 100) / 100;
+
+    return this.prisma.commandeItem.create({
+      data: {
+        commandeId, productId, quantite,
+        prixUnitaire: finalP, original_price: finalP, final_price: finalP,
+      },
+      include: { product: { select: { nom: true, reference: true, unite: true } } },
+    });
+  }
+
+  async removeItem(commandeId: number, itemId: number) {
+    await this.assertEditable(commandeId);
+    const item = await this.prisma.commandeItem.findUnique({ where: { id: itemId } });
+    if (!item || item.commandeId !== commandeId) throw new NotFoundException(`Item #${itemId} introuvable`);
+    await this.prisma.commandeItem.delete({ where: { id: itemId } });
+    return { ok: true };
   }
 
   async updateStatut(id: number, statut: string, extra?: { tracking_number?: string; delivery_date?: string; livreurId?: number | null }) {

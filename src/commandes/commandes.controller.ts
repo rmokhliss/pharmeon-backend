@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
 import { CommandesService } from './commandes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -25,6 +25,15 @@ class UpdateStatutDto {
 
 class UpdateItemPriceDto {
   @IsNumber() @IsPositive() final_price: number;
+}
+
+class UpdateItemQuantityDto {
+  @IsInt() @IsPositive() quantite: number;
+}
+
+class AddItemDto {
+  @IsInt() @IsPositive() productId: number;
+  @IsInt() @IsPositive() quantite: number;
 }
 
 @Controller('commandes')
@@ -76,5 +85,36 @@ export class CommandesController {
     @Body() dto: UpdateItemPriceDto,
   ) {
     return this.service.updateItemPrice(commandeId, itemId, dto.final_price);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':commandeId/items/:itemId/quantity')
+  updateItemQuantity(
+    @Param('commandeId', ParseIntPipe) commandeId: number,
+    @Param('itemId', ParseIntPipe) itemId: number,
+    @Body() dto: UpdateItemQuantityDto,
+  ) {
+    return this.service.updateItemQuantity(commandeId, itemId, dto.quantite);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post(':commandeId/items')
+  addItem(
+    @Param('commandeId', ParseIntPipe) commandeId: number,
+    @Body() dto: AddItemDto,
+  ) {
+    return this.service.addItem(commandeId, dto.productId, dto.quantite);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Delete(':commandeId/items/:itemId')
+  removeItem(
+    @Param('commandeId', ParseIntPipe) commandeId: number,
+    @Param('itemId', ParseIntPipe) itemId: number,
+  ) {
+    return this.service.removeItem(commandeId, itemId);
   }
 }
