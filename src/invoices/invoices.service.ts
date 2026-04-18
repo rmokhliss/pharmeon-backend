@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class InvoicesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private pdf: PdfService,
+  ) {}
 
   findAll() {
     return this.prisma.facture.findMany({
@@ -43,7 +47,11 @@ export class InvoicesService {
   }
 
   async updateStatut(id: number, statut: string) {
-    const validStatuts = ['BROUILLON', 'EMISE', 'PAYEE', 'ANNULEE'];
     return this.prisma.facture.update({ where: { id }, data: { statut } });
+  }
+
+  async generatePdf(id: number): Promise<string> {
+    const facture = await this.findOne(id);
+    return this.pdf.generateInvoiceHtml(facture as any);
   }
 }

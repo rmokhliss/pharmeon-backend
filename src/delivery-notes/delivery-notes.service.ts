@@ -1,24 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { PdfService } from '../pdf/pdf.service';
 
 @Injectable()
 export class DeliveryNotesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private pdf: PdfService,
+  ) {}
 
   findAll() {
     return this.prisma.bonLivraison.findMany({
       include: {
-        commande: {
-          select: { reference: true, client: { select: { nom: true, ville: true } } },
-        },
+        commande: { select: { reference: true, client: { select: { nom: true } } } },
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  findByCommande(commandeId: number) {
-    return this.prisma.bonLivraison.findFirst({
-      where: { commandeId },
+  findOne(id: number) {
+    return this.prisma.bonLivraison.findFirstOrThrow({
+      where: { id },
       include: {
         commande: {
           include: {
@@ -30,15 +32,8 @@ export class DeliveryNotesService {
     });
   }
 
-  async update(id: number, data: { tracking_number?: string; delivery_date?: string; statut?: string }) {
-    await this.prisma.bonLivraison.findFirstOrThrow({ where: { id } });
-    return this.prisma.bonLivraison.update({
-      where: { id },
-      data: {
-        ...(data.tracking_number !== undefined && { tracking_number: data.tracking_number }),
-        ...(data.statut !== undefined && { statut: data.statut }),
-        ...(data.delivery_date !== undefined && { delivery_date: new Date(data.delivery_date) }),
-      },
-    });
+  async generatePdf(id: number): Promise<string> {
+    const bl = await this.findOne(id);
+    return this.pdf.generateDeliveryNoteHtml(bl as any);
   }
 }

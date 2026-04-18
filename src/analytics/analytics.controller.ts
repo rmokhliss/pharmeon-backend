@@ -4,15 +4,24 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
+@Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
-@Controller('analytics')
 export class AnalyticsController {
-  constructor(private service: AnalyticsService) {}
+  constructor(private readonly analyticsService: AnalyticsService) {}
 
-  @Get('dashboard') getDashboard() { return this.service.getDashboard(); }
-  @Get('products') getProducts() { return this.service.getProfitabilityByProduct(); }
-  @Get('clients') getClients() { return this.service.getProfitabilityByClient(); }
-  @Get('suppliers') getSuppliers() { return this.service.getProfitabilityBySupplier(); }
-  @Get('losses') getLosses() { return this.service.getLosses(); }
+  @Get('dashboard')
+  getDashboard() { return this.analyticsService.getDashboard(); }
+
+  @Get('profitability/products')
+  byProduct() { return this.analyticsService.getProfitabilityByProduct(); }
+
+  @Get('profitability/clients')
+  byClient() { return this.analyticsService.getProfitabilityByClient(); }
+
+  @Get('profitability/suppliers')
+  bySupplier() { return this.analyticsService.getProfitabilityBySupplier(); }
+
+  @Get('losses')
+  getLosses() { return this.analyticsService.getLosses(); }
 }
