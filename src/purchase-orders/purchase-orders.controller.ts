@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import { PurchaseOrdersService } from './purchase-orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -34,4 +35,14 @@ export class PurchaseOrdersController {
   @Post() create(@Body() dto: CreatePODto) { return this.service.create(dto); }
   @Patch(':id/statut') updateStatut(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateStatutDto) { return this.service.updateStatut(id, dto.statut); }
   @Delete(':id') remove(@Param('id', ParseIntPipe) id: number) { return this.service.remove(id); }
+
+  @Get(':id/pdf')
+  async getPdf(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+    const html = await this.service.generatePdf(id);
+    res.set({
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Disposition': `inline; filename="bc-${id}.html"`,
+    });
+    res.send(html);
+  }
 }

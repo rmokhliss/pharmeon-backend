@@ -13,6 +13,16 @@ type InvoiceData = {
   };
 };
 
+type PurchaseOrderData = {
+  reference: string;
+  statut: string;
+  note: string | null;
+  createdAt: Date;
+  expected_date: Date | null;
+  fournisseur: { nom: string; contact: string | null; telephone: string | null; ville: string | null };
+  items: { quantite: number; prix_achat: number; product: { nom: string; reference: string; unite: string } }[];
+};
+
 type DeliveryNoteData = {
   reference: string;
   delivery_date: Date | null;
@@ -113,6 +123,75 @@ export class PdfService {
         </table>
       </div>
       <div class="footer">Pharmeon — Document généré automatiquement — ${new Date().toLocaleDateString('fr-FR')}</div>
+    </body></html>`;
+  }
+
+  generatePurchaseOrderHtml(data: PurchaseOrderData): string {
+    const dateCreated = new Date(data.createdAt).toLocaleDateString('fr-FR');
+    const dateExpected = data.expected_date ? new Date(data.expected_date).toLocaleDateString('fr-FR') : '—';
+    const badgeClass =
+      data.statut === 'LIVREE' ? 'badge-green' :
+      data.statut === 'ENVOYEE' || data.statut === 'CONFIRMEE' ? 'badge-blue' : 'badge-gray';
+    let totalHT = 0;
+    const rows = data.items.map((item) => {
+      const lineTotal = Math.round(item.prix_achat * item.quantite * 100) / 100;
+      totalHT += lineTotal;
+      return `
+        <tr>
+          <td>${this.escHtml(item.product.reference)}</td>
+          <td>${this.escHtml(item.product.nom)}</td>
+          <td style="text-align:center">${item.quantite} ${this.escHtml(item.product.unite)}</td>
+          <td style="text-align:right">${item.prix_achat.toFixed(2)} MAD</td>
+          <td style="text-align:right">${lineTotal.toFixed(2)} MAD</td>
+        </tr>`;
+    }).join('');
+    totalHT = Math.round(totalHT * 100) / 100;
+    const totalTTC = Math.round(totalHT * 1.2 * 100) / 100;
+
+    return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+      <style>${this.baseStyle()}</style></head><body>
+      <div class="header">
+        <div>
+          <div class="logo">Pharmeon</div>
+          <p style="color:#6b7280;font-size:12px;margin:4px 0 0">Grossiste pharmaceutique</p>
+        </div>
+        <div style="text-align:right">
+          <p class="doc-title">BON DE COMMANDE</p>
+          <p class="doc-ref">${this.escHtml(data.reference)}</p>
+          <p class="doc-ref">Émis le ${dateCreated}</p>
+          <span class="badge ${badgeClass}">${data.statut}</span>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-block">
+          <h4>Fournisseur</h4>
+          <p><strong>${this.escHtml(data.fournisseur.nom)}</strong></p>
+          ${data.fournisseur.contact ? `<p>${this.escHtml(data.fournisseur.contact)}</p>` : ''}
+          ${data.fournisseur.ville ? `<p>${this.escHtml(data.fournisseur.ville)}</p>` : ''}
+          ${data.fournisseur.telephone ? `<p>${this.escHtml(data.fournisseur.telephone)}</p>` : ''}
+        </div>
+        <div class="meta-block">
+          <h4>Livraison prévue</h4>
+          <p>${dateExpected}</p>
+          ${data.note ? `<h4 style="margin-top:12px">Note</h4><p>${this.escHtml(data.note)}</p>` : ''}
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Réf.</th><th>Désignation</th><th>Qté</th><th>PU HT</th><th>Total HT</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="totals">
+        <table>
+          <tr><td>Total HT</td><td>${totalHT.toFixed(2)} MAD</td></tr>
+          <tr><td>TVA (20%)</td><td>${(totalTTC - totalHT).toFixed(2)} MAD</td></tr>
+          <tr class="total-ttc"><td><strong>Total TTC</strong></td><td><strong>${totalTTC.toFixed(2)} MAD</strong></td></tr>
+        </table>
+      </div>
+      <div style="margin-top:40px;display:flex;justify-content:space-between">
+        <div><p style="color:#6b7280;font-size:12px">Signature Pharmeon</p><div style="border-top:1px solid #9ca3af;width:200px;margin-top:40px"></div></div>
+        <div><p style="color:#6b7280;font-size:12px">Signature fournisseur</p><div style="border-top:1px solid #9ca3af;width:200px;margin-top:40px"></div></div>
+      </div>
+      <div class="footer">Pharmeon — Bon de commande généré automatiquement — ${new Date().toLocaleDateString('fr-FR')}</div>
     </body></html>`;
   }
 

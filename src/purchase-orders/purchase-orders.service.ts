@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { PdfService } from '../pdf/pdf.service';
 
 type CreatePODto = {
   fournisseurId: number;
@@ -10,7 +11,19 @@ type CreatePODto = {
 
 @Injectable()
 export class PurchaseOrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private pdf: PdfService) {}
+
+  async generatePdf(id: number): Promise<string> {
+    const po = await this.prisma.bonCommandeFournisseur.findUnique({
+      where: { id },
+      include: {
+        fournisseur: true,
+        items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+      },
+    });
+    if (!po) throw new NotFoundException(`Bon de commande #${id} introuvable`);
+    return this.pdf.generatePurchaseOrderHtml(po);
+  }
 
   findAll() {
     return this.prisma.bonCommandeFournisseur.findMany({
