@@ -59,6 +59,45 @@ export class AuthService {
     return { token };
   }
 
+  async registerPublic(input: { nom: string; email: string; telephone?: string; password: string }) {
+    const { nom, email, telephone, password } = input;
+    const existing = await this.prisma.client.findUnique({ where: { email } });
+    if (existing) {
+      if (!existing.password) {
+        const hashed = await bcrypt.hash(password, 10);
+        const updated = await this.prisma.client.update({
+          where: { id: existing.id },
+          data: { password: hashed, telephone: telephone || existing.telephone, actif: true, approved: true },
+        });
+        return this.issueToken(updated);
+      }
+      throw new UnauthorizedException('Un compte existe déjà avec cet email');
+    }
+    const hashed = await bcrypt.hash(password, 10);
+    const client = await this.prisma.client.create({
+      data: {
+        nom, email, telephone,
+        type: 'PARTICULIER',
+        role: 'CLIENT_PUBLIC',
+        password: hashed,
+        actif: true,
+        approved: true,
+      },
+    });
+    return this.issueToken(client);
+  }
+
+  private issueToken(client: { id: number; nom: string; email: string | null; type: string; role: string; ville: string | null; approved: boolean }) {
+    const token = this.jwt.sign({ sub: client.id, email: client.email, nom: client.nom, role: client.role });
+    return {
+      token,
+      client: {
+        id: client.id, nom: client.nom, email: client.email,
+        type: client.type, role: client.role, ville: client.ville, approved: client.approved,
+      },
+    };
+  }
+
   async setPassword(clientId: number, password: string) {
     const hashed = await bcrypt.hash(password, 10);
     return this.prisma.client.update({ where: { id: clientId }, data: { password: hashed } });
