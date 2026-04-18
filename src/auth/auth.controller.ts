@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Patch, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, Patch, Param, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { IsString, MinLength } from 'class-validator';
 
 class LoginDto {
@@ -28,6 +29,12 @@ export class AuthController {
   @Post('admin/login')
   adminLogin(@Body() dto: AdminLoginDto) {
     return this.auth.adminLogin(dto.username, dto.password);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@Request() req: any) {
+    return this.auth.me(req.user.id);
   }
 
   @Patch('client/:id/password')

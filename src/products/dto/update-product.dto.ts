@@ -1,4 +1,19 @@
-import { PartialType, OmitType } from '@nestjs/mapped-types';
-import { CreateProductDto } from './create-product.dto';
+import { IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
-export class UpdateProductDto extends PartialType(OmitType(CreateProductDto, ['reference'] as const)) {}
+export class UpdateProductDto {
+  @IsOptional() @IsString() nom?: string;
+  @IsOptional() @IsString() marque?: string;
+  @IsOptional() @IsString() categorie?: string;
+  @IsOptional() @IsNumber() @IsPositive() prix_achat?: number;
+  @IsOptional() @IsNumber() @IsPositive() prix_vente?: number;
+  @IsOptional() @IsNumber() @IsPositive() cost_price?: number;
+  @IsOptional() @IsNumber() @IsPositive() retail_price?: number;
+  @IsOptional() @IsNumber() @Min(0) wholesale_price?: number;
+  @IsOptional() @IsNumber() @Min(0) retail_discount_pct?: number;
+  @IsOptional() @IsNumber() @Min(0) wholesale_discount_pct?: number;
+  @IsOptional() @IsString() unite?: string;
+  @IsOptional() @IsNumber() @Min(0) stock?: number;
+  @IsOptional() @IsNumber() @Min(0) stock_min?: number;
+  @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() image_url?: string;
+}
