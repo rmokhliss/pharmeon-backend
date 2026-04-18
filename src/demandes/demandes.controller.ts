@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { DemandesService, CreateDemandeDto } from './demandes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -13,8 +13,14 @@ export class DemandesController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query('statut') statut?: string) {
+    return this.service.findAll(statut);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('pending-count')
+  pendingCount() {
+    return this.service.pendingCount();
   }
 
   @UseGuards(JwtAuthGuard)

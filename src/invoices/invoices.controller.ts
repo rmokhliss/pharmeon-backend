@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, Param, Body, ParseIntPipe, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { InvoicesService } from './invoices.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
