@@ -25,6 +25,7 @@ model Product {
   stock_min              Int                          @default(5)
   description            String?
   image_url              String?
+  audience               String                       @default("BOTH")
   actif                  Boolean                      @default(true)
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @updatedAt

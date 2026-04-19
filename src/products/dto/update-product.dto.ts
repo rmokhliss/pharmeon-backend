@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, IsString, Min, IsIn } from 'class-validator';
 
 export class UpdateProductDto {
   @IsOptional() @IsString() nom?: string;
@@ -16,4 +16,5 @@ export class UpdateProductDto {
   @IsOptional() @IsNumber() @Min(0) stock_min?: number;
   @IsOptional() @IsString() description?: string;
   @IsOptional() @IsString() image_url?: string;
+  @IsOptional() @IsIn(['PUBLIC', 'PRO', 'BOTH']) audience?: string;
 }

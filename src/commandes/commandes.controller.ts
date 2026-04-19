@@ -87,6 +87,22 @@ export class CommandesController {
     res.send(html);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('mes-commandes/:id/bl-pdf')
+  async getMyBlPdf(@Param('id', ParseIntPipe) id: number, @Request() req: any, @Res() res: Response) {
+    const html = await this.service.generateBlPdf(id, req.user.id);
+    res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `inline; filename="bl-${id}.html"` });
+    res.send(html);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('mes-commandes/:id/facture-pdf')
+  async getMyFacturePdf(@Param('id', ParseIntPipe) id: number, @Request() req: any, @Res() res: Response) {
+    const html = await this.service.generateFacturePdf(id, req.user.id);
+    res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `inline; filename="facture-${id}.html"` });
+    res.send(html);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id/statut')

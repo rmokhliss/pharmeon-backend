@@ -37,10 +37,18 @@ export class ProductsService {
     };
   }
 
+  private audienceFilter(role?: string) {
+    if (role === 'ADMIN') return undefined;
+    if (role === 'PRO') return { in: ['PRO', 'BOTH'] };
+    return { in: ['PUBLIC', 'BOTH'] };
+  }
+
   async findAll(search?: string, categorie?: string, role?: string) {
+    const audience = this.audienceFilter(role);
     const products = await this.prisma.product.findMany({
       where: {
         actif: true,
+        ...(audience && { audience }),
         ...(search && {
           OR: [
             { nom: { contains: search, mode: 'insensitive' } },
@@ -67,6 +75,10 @@ export class ProductsService {
   async findOne(id: number, role?: string) {
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) throw new NotFoundException(`Produit #${id} introuvable`);
+    const audience = this.audienceFilter(role);
+    if (audience && !audience.in.includes(product.audience)) {
+      throw new NotFoundException(`Produit #${id} introuvable`);
+    }
     return this.filterPriceByRole(product, role);
   }
 

@@ -199,7 +199,23 @@ async function main() {
     'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400',
   ];
   const round2 = (n: number) => Math.round(n * 100) / 100;
+  const pickAudience = (p: any, i: number): string => {
+    const cat = (p.categorie || '').toLowerCase();
+    const nom = (p.nom || '').toLowerCase();
+    // Pro-only: medical-grade, diagnostic, bulk packaging keywords
+    if (/seringue|bistouri|pansement stérile|gant stérile|matériel médical|diagnostic|réactif|test rapide/.test(nom)) return 'PRO';
+    if (/matériel médical|diagnostic|dispositif/.test(cat)) return 'PRO';
+    // Public-only: mass-market beauty, baby care, hygiene
+    if (/bain|lait bébé|shampoing bébé|dentifrice|brosse à dents|cosmétique/.test(nom)) return 'PUBLIC';
+    if (/cosmétique|bébé|hygiène/.test(cat)) return 'PUBLIC';
+    // Deterministic split for remainder: 20% PRO, 20% PUBLIC, 60% BOTH
+    const r = i % 10;
+    if (r < 2) return 'PRO';
+    if (r < 4) return 'PUBLIC';
+    return 'BOTH';
+  };
   let priceUpdates = 0;
+  const audienceCount = { PUBLIC: 0, PRO: 0, BOTH: 0 } as Record<string, number>;
   for (let i = 0; i < allProducts.length; i++) {
     const p = allProducts[i];
     const retail = p.retail_price && p.retail_price > 0 ? p.retail_price : p.prix_vente;
@@ -208,6 +224,8 @@ async function main() {
     // Promo patterns: every 5th retail on promo (8%), every 3rd pro gets volume discount (6%)
     const retailDiscount = i % 5 === 0 ? 8 : i % 7 === 0 ? 12 : 0;
     const wholesaleDiscount = i % 3 === 0 ? 6 : i % 9 === 0 ? 10 : 0;
+    const audience = pickAudience(p, i);
+    audienceCount[audience] = (audienceCount[audience] || 0) + 1;
     await prisma.product.update({
       where: { id: p.id },
       data: {
@@ -217,11 +235,13 @@ async function main() {
         retail_discount_pct: retailDiscount,
         wholesale_discount_pct: wholesaleDiscount,
         image_url: p.image_url ?? imagePool[i % imagePool.length],
+        audience,
       },
     });
     priceUpdates++;
   }
   console.log(`✓ ${priceUpdates} produits avec matrice prix (retail/wholesale + remises) + images`);
+  console.log(`  · Audience: PUBLIC=${audienceCount.PUBLIC}, PRO=${audienceCount.PRO}, BOTH=${audienceCount.BOTH}`);
 
   if (allProducts.length < 4) {
     console.log("⚠️  Pas assez de produits — lance d'abord le seed principal.");

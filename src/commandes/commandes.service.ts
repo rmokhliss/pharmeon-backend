@@ -186,6 +186,47 @@ export class CommandesService {
     return { ok: true };
   }
 
+  async generateBlPdf(commandeId: number, clientId?: number): Promise<string> {
+    const commande = await this.prisma.commande.findFirstOrThrow({
+      where: { id: commandeId, ...(clientId ? { clientId } : {}) },
+      select: { id: true },
+    });
+    const bl = await this.prisma.bonLivraison.findFirst({
+      where: { commandeId: commande.id },
+      include: {
+        commande: {
+          include: {
+            items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+            client: { select: { nom: true, ville: true, telephone: true, adresse: true } },
+          },
+        },
+        livreur: true,
+      },
+    });
+    if (!bl) throw new NotFoundException(`Bon de livraison introuvable pour la commande #${commandeId}`);
+    return this.pdf.generateDeliveryNoteHtml(bl as any);
+  }
+
+  async generateFacturePdf(commandeId: number, clientId?: number): Promise<string> {
+    const commande = await this.prisma.commande.findFirstOrThrow({
+      where: { id: commandeId, ...(clientId ? { clientId } : {}) },
+      select: { id: true },
+    });
+    const facture = await this.prisma.facture.findFirst({
+      where: { commandeId: commande.id },
+      include: {
+        commande: {
+          include: {
+            items: { include: { product: { select: { nom: true, reference: true, unite: true } } } },
+            client: { select: { nom: true, ville: true, telephone: true, adresse: true } },
+          },
+        },
+      },
+    });
+    if (!facture) throw new NotFoundException(`Facture introuvable pour la commande #${commandeId}`);
+    return this.pdf.generateInvoiceHtml(facture as any);
+  }
+
   async updateStatut(id: number, statut: string, extra?: { tracking_number?: string; delivery_date?: string; livreurId?: number | null }) {
     const validStatuts = ['EN_ATTENTE', 'VALIDEE', 'EN_COURS', 'LIVREE', 'ANNULEE'];
     if (!validStatuts.includes(statut)) throw new BadRequestException('Statut invalide');
